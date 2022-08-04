@@ -773,8 +773,6 @@ func (m *CreateRequest) validate(all bool) error {
 
 	// no validation rules for Data
 
-	// no validation rules for Context
-
 	if len(errors) > 0 {
 		return CreateRequestMultiError(errors)
 	}
@@ -977,8 +975,6 @@ func (m *UpdateRequest) validate(all bool) error {
 
 	// no validation rules for Data
 
-	// no validation rules for Context
-
 	if len(errors) > 0 {
 		return UpdateRequestMultiError(errors)
 	}
@@ -1180,8 +1176,6 @@ func (m *RetrieveRequest) validate(all bool) error {
 	var errors []error
 
 	// no validation rules for Key
-
-	// no validation rules for Context
 
 	if len(errors) > 0 {
 		return RetrieveRequestMultiError(errors)
@@ -1386,8 +1380,6 @@ func (m *DeleteRequest) validate(all bool) error {
 	var errors []error
 
 	// no validation rules for Key
-
-	// no validation rules for Context
 
 	if len(errors) > 0 {
 		return DeleteRequestMultiError(errors)

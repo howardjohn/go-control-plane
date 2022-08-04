@@ -1513,33 +1513,19 @@ func (m *WeightedCluster) validate(all bool) error {
 
 	}
 
-	if all {
-		switch v := interface{}(m.GetTotalWeight()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, WeightedClusterValidationError{
-					field:  "TotalWeight",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, WeightedClusterValidationError{
-					field:  "TotalWeight",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetTotalWeight()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return WeightedClusterValidationError{
+	if wrapper := m.GetTotalWeight(); wrapper != nil {
+
+		if wrapper.GetValue() < 1 {
+			err := WeightedClusterValidationError{
 				field:  "TotalWeight",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be greater than or equal to 1",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
+
 	}
 
 	// no validation rules for RuntimeKeyPrefix
@@ -2119,35 +2105,21 @@ func (m *RouteMatch) validate(all bool) error {
 			errors = append(errors, err)
 		}
 
-	case *RouteMatch_PathMatchPolicy:
+	case *RouteMatch_PathTemplate:
 
-		if all {
-			switch v := interface{}(m.GetPathMatchPolicy()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, RouteMatchValidationError{
-						field:  "PathMatchPolicy",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
+		if m.GetPathTemplate() != "" {
+
+			if l := utf8.RuneCountInString(m.GetPathTemplate()); l < 1 || l > 256 {
+				err := RouteMatchValidationError{
+					field:  "PathTemplate",
+					reason: "value length must be between 1 and 256 runes, inclusive",
 				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, RouteMatchValidationError{
-						field:  "PathMatchPolicy",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
+				if !all {
+					return err
 				}
+				errors = append(errors, err)
 			}
-		} else if v, ok := interface{}(m.GetPathMatchPolicy()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return RouteMatchValidationError{
-					field:  "PathMatchPolicy",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
+
 		}
 
 	default:
@@ -2357,35 +2329,6 @@ func (m *CorsPolicy) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return CorsPolicyValidationError{
 				field:  "ShadowEnabled",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if all {
-		switch v := interface{}(m.GetAllowPrivateNetworkAccess()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, CorsPolicyValidationError{
-					field:  "AllowPrivateNetworkAccess",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, CorsPolicyValidationError{
-					field:  "AllowPrivateNetworkAccess",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetAllowPrivateNetworkAccess()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CorsPolicyValidationError{
-				field:  "AllowPrivateNetworkAccess",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -2606,33 +2549,19 @@ func (m *RouteAction) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetPathRewritePolicy()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, RouteActionValidationError{
-					field:  "PathRewritePolicy",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
+	if m.GetPathTemplateRewrite() != "" {
+
+		if l := utf8.RuneCountInString(m.GetPathTemplateRewrite()); l < 1 || l > 256 {
+			err := RouteActionValidationError{
+				field:  "PathTemplateRewrite",
+				reason: "value length must be between 1 and 256 runes, inclusive",
 			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, RouteActionValidationError{
-					field:  "PathRewritePolicy",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
+			if !all {
+				return err
 			}
+			errors = append(errors, err)
 		}
-	} else if v, ok := interface{}(m.GetPathRewritePolicy()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RouteActionValidationError{
-				field:  "PathRewritePolicy",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
+
 	}
 
 	// no validation rules for AppendXForwardedHost
@@ -5199,8 +5128,6 @@ func (m *HeaderMatcher) validate(all bool) error {
 	}
 
 	// no validation rules for InvertMatch
-
-	// no validation rules for TreatMissingHeaderAsEmpty
 
 	switch m.HeaderMatchSpecifier.(type) {
 

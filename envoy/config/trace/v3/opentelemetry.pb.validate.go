@@ -97,8 +97,6 @@ func (m *OpenTelemetryConfig) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for ServiceName
-
 	if len(errors) > 0 {
 		return OpenTelemetryConfigMultiError(errors)
 	}
